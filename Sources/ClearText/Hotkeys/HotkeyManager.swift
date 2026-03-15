@@ -52,8 +52,9 @@ final class HotkeyManager: @unchecked Sendable {
         if let src = runLoopSource { CFRunLoopRemoveSource(CFRunLoopGetMain(), src, .commonModes) }
         eventTap = nil
         runLoopSource = nil
-        selfPtr?.release()  // balance the passRetained from installTap
+        let ptr = selfPtr   // swap before release to prevent double-release
         selfPtr = nil
+        ptr?.release()
         DistributedNotificationCenter.default().removeObserver(self)
     }
 
@@ -67,6 +68,7 @@ final class HotkeyManager: @unchecked Sendable {
     // MARK: - Private
 
     private func installTap() {
+        guard eventTap == nil else { return }  // already installed
         // .commonModes ensures the tap fires even when a modal panel is tracking events.
         // .headInsertEventTap places this tap first in the chain so it can consume shortcuts
         // before other apps or system handlers see them.
