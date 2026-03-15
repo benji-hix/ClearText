@@ -7,8 +7,7 @@ final class ClearTextPanel: NSPanel {
     private(set) var currentAlphaStep: Int = 2  // default 0.7
     private var hoverToOpaqueEnabled: Bool = false
     private var trackingArea: NSTrackingArea?
-    // TODO: uncomment when TabIndicatorView.swift is added (Task 6)
-    // weak var tabIndicator: TabIndicatorView?
+    weak var tabIndicator: TabIndicatorView?
 
     // MARK: - Init
 
@@ -46,6 +45,17 @@ final class ClearTextPanel: NSPanel {
         blur.state = .active
         blur.autoresizingMask = [.width, .height]
         contentView = blur
+
+        let indicator = TabIndicatorView()
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        blur.addSubview(indicator)
+        NSLayoutConstraint.activate([
+            indicator.centerXAnchor.constraint(equalTo: blur.centerXAnchor),
+            indicator.topAnchor.constraint(equalTo: blur.topAnchor, constant: 8),
+            indicator.widthAnchor.constraint(equalToConstant: 54),
+            indicator.heightAnchor.constraint(equalToConstant: 6)
+        ])
+        self.tabIndicator = indicator
     }
 
     // MARK: - Transparency
