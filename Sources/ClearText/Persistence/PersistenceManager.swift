@@ -39,7 +39,7 @@ final class PersistenceManager {
     }
 
     func saveAlphaStep(_ step: Int) {
-        defaults.set(step, forKey: Keys.alphaStep)
+        defaults.set(min(4, max(0, step)), forKey: Keys.alphaStep)
     }
 
     func loadAlphaStep() -> Int {
@@ -48,7 +48,7 @@ final class PersistenceManager {
     }
 
     func saveFontSize(_ size: Int) {
-        defaults.set(size, forKey: Keys.fontSize)
+        defaults.set(min(24, max(10, size)), forKey: Keys.fontSize)
     }
 
     func loadFontSize() -> Int {

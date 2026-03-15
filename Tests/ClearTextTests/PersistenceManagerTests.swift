@@ -85,8 +85,10 @@ final class PersistenceManagerTests: XCTestCase {
 
     func test_flushImmediatelyWithDirectSave_keepsMostRecentContent() {
         sut.saveTabContent("immediate", tab: 1)
-        sut.saveTabContentDebounced("this should not win", tab: 1)
+        // Debounce queues "pending-debounced" AFTER the direct save — it's the newer value
+        sut.saveTabContentDebounced("pending-debounced", tab: 1)
+        // flush commits the pending debounce, so "pending-debounced" (the newer) wins
         sut.flushImmediately()
-        XCTAssertEqual(sut.loadTabContent(tab: 1), "this should not win")
+        XCTAssertEqual(sut.loadTabContent(tab: 1), "pending-debounced")
     }
 }
