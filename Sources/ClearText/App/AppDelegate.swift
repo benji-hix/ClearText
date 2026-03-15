@@ -1,6 +1,5 @@
 // Sources/ClearText/App/AppDelegate.swift
 import AppKit
-import ServiceManagement
 
 @main
 @MainActor
@@ -43,13 +42,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, HotkeyDelegate {
         tabController = TabController()
         if let contentView = panel.contentView {
             tabController.addToView(contentView)
-        }
-
-        // Refresh hover tracking area on resize
-        NotificationCenter.default.addObserver(
-            forName: NSWindow.didResizeNotification, object: panel, queue: .main
-        ) { [weak self] _ in
-            self?.panel.windowDidResize()
         }
 
         // Wire tab indicator click → tab switch
@@ -96,7 +88,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, HotkeyDelegate {
         }
 
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Show ClearText", action: #selector(togglePanel), keyEquivalent: ""))
+        menu.addItem(NSMenuItem(title: "Show / Hide ClearText", action: #selector(togglePanel), keyEquivalent: ""))
         menu.addItem(NSMenuItem(title: "Preferences…", action: #selector(openPreferences), keyEquivalent: ","))
 
         let axItem = NSMenuItem(title: "Grant Accessibility Access…",
@@ -178,6 +170,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, HotkeyDelegate {
             togglePanel()
         case .toggleAlwaysOnTop:
             panel.setAlwaysOnTop(!panel.isAlwaysOnTop)
+            PersistenceManager.shared.saveAlwaysOnTopOnLaunch(panel.isAlwaysOnTop)
         case .increaseTransparency:
             panel.stepAlphaUp()
             PersistenceManager.shared.saveAlphaStep(panel.currentAlphaStep)
