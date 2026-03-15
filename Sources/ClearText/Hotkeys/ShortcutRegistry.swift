@@ -1,5 +1,6 @@
 // Sources/ClearText/Hotkeys/ShortcutRegistry.swift
 import Carbon
+import Foundation
 
 enum ShortcutRegistryError: Error, LocalizedError {
     case conflict(HotkeyAction)
@@ -16,6 +17,7 @@ final class ShortcutRegistry: @unchecked Sendable {
 
     private let defaults: UserDefaults
     private var bindings: [String: ShortcutBinding] = [:]
+    private let bindingsLock = NSLock()
 
     private static let defaultBindings: [(HotkeyAction, ShortcutBinding)] = {
         let cmdOpt = CGEventFlags.maskCommand.rawValue | CGEventFlags.maskAlternate.rawValue
@@ -49,6 +51,8 @@ final class ShortcutRegistry: @unchecked Sendable {
     }()
 
     func editorBinding(for action: EditorAction) -> ShortcutBinding {
+        bindingsLock.lock()
+        defer { bindingsLock.unlock() }
         let pKey = "cleartext.editor.\(action.rawValue)"
         if let data = defaults.data(forKey: pKey),
            let binding = try? JSONDecoder().decode(ShortcutBinding.self, from: data) {
@@ -59,9 +63,15 @@ final class ShortcutRegistry: @unchecked Sendable {
     }
 
     func updateEditorBinding(_ newBinding: ShortcutBinding, for action: EditorAction) throws {
-        for (existingAction, existingBinding) in allBindings() where existingBinding == newBinding {
+        bindingsLock.lock()
+        let currentBindings = Self.defaultBindings.map { (a, _) in
+            (a, bindings[key(for: a)] ?? defaultBinding(for: a))
+        }
+        for (existingAction, existingBinding) in currentBindings where existingBinding == newBinding {
+            bindingsLock.unlock()
             throw ShortcutRegistryError.conflict(existingAction)
         }
+        bindingsLock.unlock()
         if let data = try? JSONEncoder().encode(newBinding) {
             defaults.set(data, forKey: "cleartext.editor.\(action.rawValue)")
         }
@@ -73,28 +83,44 @@ final class ShortcutRegistry: @unchecked Sendable {
     }
 
     func binding(for action: HotkeyAction) -> ShortcutBinding {
-        bindings[key(for: action)] ?? defaultBinding(for: action)
+        bindingsLock.lock()
+        defer { bindingsLock.unlock() }
+        return bindings[key(for: action)] ?? defaultBinding(for: action)
     }
 
     func allBindings() -> [(HotkeyAction, ShortcutBinding)] {
-        Self.defaultBindings.map { (action, _) in (action, binding(for: action)) }
+        bindingsLock.lock()
+        defer { bindingsLock.unlock() }
+        return Self.defaultBindings.map { (action, _) in
+            (action, bindings[key(for: action)] ?? defaultBinding(for: action))
+        }
     }
 
     func updateBinding(_ newBinding: ShortcutBinding, for action: HotkeyAction) throws {
-        for (existingAction, existingBinding) in allBindings() {
+        bindingsLock.lock()
+        let currentBindings = Self.defaultBindings.map { (a, _) in
+            (a, bindings[key(for: a)] ?? defaultBinding(for: a))
+        }
+        for (existingAction, existingBinding) in currentBindings {
             if existingAction != action && existingBinding == newBinding {
+                bindingsLock.unlock()
                 throw ShortcutRegistryError.conflict(existingAction)
             }
         }
         bindings[key(for: action)] = newBinding
+        bindingsLock.unlock()
         persist(newBinding, for: action)
+        NotificationCenter.default.post(name: .shortcutBindingsChanged, object: nil)
     }
 
     func resetToDefaults() {
+        bindingsLock.lock()
         for (action, _) in Self.defaultBindings {
             defaults.removeObject(forKey: persistKey(for: action))
         }
         bindings.removeAll()
+        bindingsLock.unlock()
+        NotificationCenter.default.post(name: .shortcutBindingsChanged, object: nil)
     }
 
     private func defaultBinding(for action: HotkeyAction) -> ShortcutBinding {
@@ -103,6 +129,8 @@ final class ShortcutRegistry: @unchecked Sendable {
     }
 
     private func loadFromDefaults() {
+        bindingsLock.lock()
+        defer { bindingsLock.unlock() }
         for (action, _) in Self.defaultBindings {
             let pKey = persistKey(for: action)
             if let data = defaults.data(forKey: pKey),
@@ -132,4 +160,8 @@ final class ShortcutRegistry: @unchecked Sendable {
     private func persistKey(for action: HotkeyAction) -> String {
         "cleartext.shortcut.\(key(for: action))"
     }
+}
+
+extension Notification.Name {
+    static let shortcutBindingsChanged = Notification.Name("cleartext.shortcutBindingsChanged")
 }

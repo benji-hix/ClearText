@@ -41,7 +41,7 @@ final class ShortcutRegistryTests: XCTestCase {
 
     func test_updateBinding_persistsAndReadsBack() {
         let newBinding = ShortcutBinding(keyCode: 11, modifiers: CGEventFlags.maskCommand.rawValue | CGEventFlags.maskAlternate.rawValue)
-        try? sut.updateBinding(newBinding, for: .toggleAlwaysOnTop)
+        XCTAssertNoThrow(try sut.updateBinding(newBinding, for: .toggleAlwaysOnTop))
         let loaded = sut.binding(for: .toggleAlwaysOnTop)
         XCTAssertEqual(loaded, newBinding)
     }
@@ -64,7 +64,7 @@ final class ShortcutRegistryTests: XCTestCase {
     func test_resetToDefaults() {
         let original = sut.binding(for: .toggleVisibility)
         let newBinding = ShortcutBinding(keyCode: 11, modifiers: CGEventFlags.maskCommand.rawValue)
-        try? sut.updateBinding(newBinding, for: .toggleVisibility)
+        XCTAssertNoThrow(try sut.updateBinding(newBinding, for: .toggleVisibility))
         sut.resetToDefaults()
         XCTAssertEqual(sut.binding(for: .toggleVisibility), original)
     }
@@ -79,6 +79,20 @@ final class ShortcutRegistryTests: XCTestCase {
         XCTAssertThrowsError(try sut.updateBinding(binding, for: .toggleAlwaysOnTop)) { error in
             guard case ShortcutRegistryError.conflict = error else { return }
             XCTAssertFalse(error.localizedDescription.isEmpty)
+        }
+    }
+
+    func test_editorBinding_defaultForSelectWord() {
+        let binding = sut.editorBinding(for: .selectWord)
+        // Cmd+D: keyCode 2, command modifier
+        XCTAssertEqual(binding.keyCode, 2)
+        XCTAssertNotEqual(binding.modifiers & CGEventFlags.maskCommand.rawValue, 0)
+    }
+
+    func test_editorBinding_allActionsHaveDefaults() {
+        for action in ShortcutRegistry.EditorAction.allCases {
+            let binding = sut.editorBinding(for: action)
+            XCTAssertFalse(binding.displayString.isEmpty, "No default for editor action \(action)")
         }
     }
 }
