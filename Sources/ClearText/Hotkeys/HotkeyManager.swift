@@ -54,6 +54,7 @@ final class HotkeyManager: @unchecked Sendable {
         runLoopSource = nil
         selfPtr?.release()  // balance the passRetained from installTap
         selfPtr = nil
+        DistributedNotificationCenter.default().removeObserver(self)
     }
 
     func refreshBindingTable() {
@@ -66,6 +67,9 @@ final class HotkeyManager: @unchecked Sendable {
     // MARK: - Private
 
     private func installTap() {
+        // .commonModes ensures the tap fires even when a modal panel is tracking events.
+        // .headInsertEventTap places this tap first in the chain so it can consume shortcuts
+        // before other apps or system handlers see them.
         let mask = CGEventMask(1 << CGEventType.keyDown.rawValue)
         let retained = Unmanaged.passRetained(self)
         selfPtr = retained
@@ -96,7 +100,7 @@ final class HotkeyManager: @unchecked Sendable {
         CGEvent.tapEnable(tap: tap, enable: true)
     }
 
-    private func handleEvent(_ event: CGEvent) -> Unmanaged<CGEvent>? {
+    func handleEvent(_ event: CGEvent) -> Unmanaged<CGEvent>? {
         let keyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
         let rawMods = event.flags.rawValue & ShortcutBinding.modifierMask
 
