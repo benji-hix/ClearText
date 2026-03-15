@@ -4,14 +4,17 @@ import Foundation
 
 enum ShortcutRegistryError: Error, LocalizedError {
     case conflict(HotkeyAction)
+    case editorConflict(ShortcutRegistry.EditorAction)
 
     var errorDescription: String? {
         switch self {
         case .conflict(let action): return "Already used by: \(action)"
+        case .editorConflict(let action): return "Already used by editor action: \(action.rawValue)"
         }
     }
 }
 
+// @unchecked Sendable: all mutable state (bindings dict) is protected by bindingsLock.
 final class ShortcutRegistry: @unchecked Sendable {
     static let shared = ShortcutRegistry()
 
@@ -64,14 +67,23 @@ final class ShortcutRegistry: @unchecked Sendable {
 
     func updateEditorBinding(_ newBinding: ShortcutBinding, for action: EditorAction) throws {
         bindingsLock.lock()
-        let currentBindings = Self.defaultBindings.map { (a, _) in
-            (a, bindings[key(for: a)] ?? defaultBinding(for: a))
-        }
-        for (existingAction, existingBinding) in currentBindings where existingBinding == newBinding {
-            bindingsLock.unlock()
-            throw ShortcutRegistryError.conflict(existingAction)
+        let globalBindings = Self.defaultBindings.map { (act, _) in
+            (act, bindings[key(for: act)] ?? defaultBinding(for: act))
         }
         bindingsLock.unlock()
+
+        // Check conflict against global hotkeys
+        for (existingAction, existingBinding) in globalBindings where existingBinding == newBinding {
+            throw ShortcutRegistryError.conflict(existingAction)
+        }
+        // Check conflict against other editor bindings
+        for existingAction in EditorAction.allCases where existingAction != action {
+            if editorBinding(for: existingAction) == newBinding {
+                // Use a generic conflict description for editor-vs-editor (no HotkeyAction to reference)
+                throw ShortcutRegistryError.editorConflict(existingAction)
+            }
+        }
+
         if let data = try? JSONEncoder().encode(newBinding) {
             defaults.set(data, forKey: "cleartext.editor.\(action.rawValue)")
         }
@@ -117,6 +129,10 @@ final class ShortcutRegistry: @unchecked Sendable {
         bindingsLock.lock()
         for (action, _) in Self.defaultBindings {
             defaults.removeObject(forKey: persistKey(for: action))
+        }
+        // Also reset editor bindings
+        for action in EditorAction.allCases {
+            defaults.removeObject(forKey: "cleartext.editor.\(action.rawValue)")
         }
         bindings.removeAll()
         bindingsLock.unlock()

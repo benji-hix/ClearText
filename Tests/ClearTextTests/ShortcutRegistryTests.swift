@@ -77,8 +77,11 @@ final class ShortcutRegistryTests: XCTestCase {
     func test_conflictDescription() {
         let binding = sut.binding(for: .toggleVisibility)
         XCTAssertThrowsError(try sut.updateBinding(binding, for: .toggleAlwaysOnTop)) { error in
-            guard case ShortcutRegistryError.conflict = error else { return }
-            XCTAssertFalse(error.localizedDescription.isEmpty)
+            if case ShortcutRegistryError.conflict = error {
+                XCTAssertFalse(error.localizedDescription.isEmpty)
+            } else {
+                XCTFail("Expected ShortcutRegistryError.conflict, got \(error)")
+            }
         }
     }
 
