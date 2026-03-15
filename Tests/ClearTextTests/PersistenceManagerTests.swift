@@ -2,21 +2,22 @@
 import XCTest
 @testable import ClearText
 
+@MainActor
 final class PersistenceManagerTests: XCTestCase {
     var sut: PersistenceManager!
     var defaults: UserDefaults!
     private var suiteName: String!
 
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         suiteName = "cleartext.tests.\(UUID().uuidString)"
         defaults = UserDefaults(suiteName: suiteName)!
         sut = PersistenceManager(defaults: defaults)
     }
 
-    override func tearDown() {
+    override func tearDown() async throws {
         defaults.removePersistentDomain(forName: suiteName)
-        super.tearDown()
+        try await super.tearDown()
     }
 
     func test_saveAndLoadTabContent() {

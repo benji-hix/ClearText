@@ -1,8 +1,9 @@
 // Sources/ClearText/Persistence/PersistenceManager.swift
 import Foundation
 
+@MainActor
 final class PersistenceManager {
-    nonisolated(unsafe) static let shared = PersistenceManager()
+    static let shared = PersistenceManager()
 
     private let defaults: UserDefaults
     private var debounceTimers: [Int: Timer] = [:]
@@ -87,6 +88,5 @@ final class PersistenceManager {
         pendingContent.removeAll()
         debounceTimers.values.forEach { $0.invalidate() }
         debounceTimers.removeAll()
-        defaults.synchronize()
     }
 }
