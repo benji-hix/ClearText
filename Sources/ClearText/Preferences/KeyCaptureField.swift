@@ -13,6 +13,7 @@ final class KeyCaptureField: NSTextField {
     weak var captureDelegate: (any KeyCaptureFieldDelegate)?
     private var isCapturing: Bool = false
     private var conflictLabel: NSTextField?
+    private var savedStringValue: String = ""
 
     // MARK: - Mouse
 
@@ -48,8 +49,10 @@ final class KeyCaptureField: NSTextField {
             exitCaptureMode()
             captureDelegate?.keyCaptureField(self, didCapture: binding, for: action)
         } catch ShortcutRegistryError.conflict(let conflicting) {
-            showConflict(conflicting, for: action)
+            showConflict(conflicting.description, for: action)
             captureDelegate?.keyCaptureField(self, conflictedWith: conflicting, for: action)
+        } catch ShortcutRegistryError.editorConflict(let conflicting) {
+            showConflict("Already used by: \(conflicting)", for: action)
         } catch {
             exitCaptureMode()
         }
@@ -60,6 +63,7 @@ final class KeyCaptureField: NSTextField {
     private func enterCaptureMode() {
         isCapturing = true
         placeholderString = "Type shortcut…"
+        savedStringValue = stringValue
         stringValue = ""
         window?.makeFirstResponder(self)
         clearConflict()
@@ -68,21 +72,21 @@ final class KeyCaptureField: NSTextField {
     private func exitCaptureMode() {
         isCapturing = false
         placeholderString = nil
+        stringValue = savedStringValue
     }
 
-    private func showConflict(_ conflicting: HotkeyAction, for action: HotkeyAction) {
+    private func showConflict(_ message: String, for action: HotkeyAction) {
         clearConflict()
-        let label = NSTextField(labelWithString: "Already used by: \(conflicting)")
+        let label = NSTextField(labelWithString: message)
         label.textColor = .systemRed
         label.font = .systemFont(ofSize: 11)
         label.translatesAutoresizingMaskIntoConstraints = false
-        superview?.addSubview(label)
-        if let sv = superview {
-            NSLayoutConstraint.activate([
-                label.leadingAnchor.constraint(equalTo: leadingAnchor),
-                label.topAnchor.constraint(equalTo: bottomAnchor, constant: 2)
-            ])
-        }
+        guard let sv = superview else { return }
+        sv.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: leadingAnchor),
+            label.topAnchor.constraint(equalTo: bottomAnchor, constant: 2)
+        ])
         conflictLabel = label
     }
 
