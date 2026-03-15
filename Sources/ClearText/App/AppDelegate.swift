@@ -10,7 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, HotkeyDelegate {
     private var panel: ClearTextPanel!
     private var tabController: TabController!
     var hotkeyManager: HotkeyManager!  // internal access — read by PreferencesWindowController
-    // private var preferencesController: PreferencesWindowController?  // TODO: implement in Task 11
+    private var preferencesController: PreferencesWindowController?
 
     private weak var previousApp: NSRunningApplication?
     private var accessibilityMenuItem: NSMenuItem?
@@ -196,7 +196,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, HotkeyDelegate {
     // MARK: - Menu Actions
 
     @objc private func openPreferences() {
-        // TODO: implement in Task 11
+        if preferencesController == nil {
+            preferencesController = PreferencesWindowController()
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        preferencesController?.showWindow(nil)
     }
 
     @objc private func openAccessibilitySettings() {
