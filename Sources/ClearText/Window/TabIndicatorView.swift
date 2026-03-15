@@ -37,9 +37,14 @@ final class TabIndicatorView: NSView {
         if tab == activeTab {
             return NSColor.controlAccentColor.withAlphaComponent(0.6)
         } else {
-            return (NSApp.effectiveAppearance.name == .darkAqua ? NSColor.white : NSColor.black)
-                .withAlphaComponent(0.2)
+            let isDark = effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            return (isDark ? NSColor.white : NSColor.black).withAlphaComponent(0.2)
         }
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        needsDisplay = true
     }
 
     // MARK: - Mouse
