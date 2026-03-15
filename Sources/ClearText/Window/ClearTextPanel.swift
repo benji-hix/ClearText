@@ -4,7 +4,7 @@ import AppKit
 final class ClearTextPanel: NSPanel {
 
     static let alphaSteps: [CGFloat] = [0.3, 0.5, 0.7, 0.9, 1.0]
-    private var currentAlphaStep: Int = 2  // default 0.7
+    private(set) var currentAlphaStep: Int = 2  // default 0.7
     private var hoverToOpaqueEnabled: Bool = false
     private var trackingArea: NSTrackingArea?
     // TODO: uncomment when TabIndicatorView.swift is added (Task 6)
@@ -30,6 +30,7 @@ final class ClearTextPanel: NSPanel {
     // MARK: - Configuration
 
     private func configure() {
+        self.delegate = self
         isFloatingPanel = true
         backgroundColor = .clear
         isOpaque = false
@@ -62,8 +63,6 @@ final class ClearTextPanel: NSPanel {
         animator().alphaValue = Self.alphaSteps[currentAlphaStep]
     }
 
-    func getCurrentAlphaStep() -> Int { currentAlphaStep }
-
     // MARK: - Always on Top
 
     func setAlwaysOnTop(_ on: Bool) {
@@ -90,15 +89,10 @@ final class ClearTextPanel: NSPanel {
         }
         trackingArea = nil
         guard hoverToOpaqueEnabled, let cv = contentView else { return }
-        let opts: NSTrackingArea.Options = [.mouseEnteredAndExited, .activeAlways]
+        let opts: NSTrackingArea.Options = [.mouseEnteredAndExited, .activeAlways, .inVisibleRect]
         let area = NSTrackingArea(rect: cv.bounds, options: opts, owner: self, userInfo: nil)
         cv.addTrackingArea(area)
         trackingArea = area
-    }
-
-    func windowDidResize() {
-        guard hoverToOpaqueEnabled else { return }
-        updateTrackingArea()
     }
 
     override func mouseEntered(with event: NSEvent) {
@@ -115,4 +109,13 @@ final class ClearTextPanel: NSPanel {
 
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
+}
+
+// MARK: - NSWindowDelegate
+
+extension ClearTextPanel: NSWindowDelegate {
+    func windowDidResize(_ notification: Notification) {
+        guard hoverToOpaqueEnabled else { return }
+        updateTrackingArea()
+    }
 }
