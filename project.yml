@@ -1,0 +1,43 @@
+name: ClearText
+
+options:
+  bundleIdPrefix: com.benji
+  deploymentTarget:
+    macOS: "26.0"
+  xcodeVersion: "26.0"
+  createIntermediateGroups: true
+
+targets:
+
+  ClearText:
+    type: application
+    platform: macOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Sources/ClearText
+    info:
+      path: Sources/ClearText/App/Info.plist
+      properties:
+        LSUIElement: true
+    entitlements:
+      path: Sources/ClearText/App/ClearText.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.benji.ClearText
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        ALWAYS_SEARCH_USER_PATHS: NO
+
+  ClearTextTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Tests/ClearTextTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.benji.ClearTextTests
+        SWIFT_VERSION: "6.0"
+    dependencies:
+      - target: ClearText
