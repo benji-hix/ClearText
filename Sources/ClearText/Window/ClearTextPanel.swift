@@ -129,3 +129,22 @@ extension ClearTextPanel: NSWindowDelegate {
         updateTrackingArea()
     }
 }
+
+// MARK: - Public resize helper (called directly by AppDelegate)
+
+extension ClearTextPanel {
+    /// Called by AppDelegate's NSWindow.didResizeNotification observer.
+    func windowDidResize() {
+        guard hoverToOpaqueEnabled else { return }
+        updateTrackingArea()
+    }
+}
+
+// MARK: - Notification names
+
+// Notification names used by AppDelegate and PreferencesWindowController
+extension Notification.Name {
+    static let clearTextAlphaStepChanged = Notification.Name("clearTextAlphaStepChanged")
+    static let clearTextHoverToOpaqueChanged = Notification.Name("clearTextHoverToOpaqueChanged")
+    static let clearTextFontSizeChanged = Notification.Name("clearTextFontSizeChanged")
+}
