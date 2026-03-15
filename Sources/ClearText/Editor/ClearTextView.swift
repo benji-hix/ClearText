@@ -37,8 +37,11 @@ final class ClearTextView: NSTextView {
         isAutomaticSpellingCorrectionEnabled = false
         isAutomaticQuoteSubstitutionEnabled = false
         isAutomaticDashSubstitutionEnabled = false
+        isAutomaticTextReplacementEnabled = false
+        isAutomaticTextCompletionEnabled = false
         isGrammarCheckingEnabled = false
         isContinuousSpellCheckingEnabled = false
+        // rulersVisible: N/A on this SDK — NSTextView has no ruler by default
         drawsBackground = false
         backgroundColor = .clear
 

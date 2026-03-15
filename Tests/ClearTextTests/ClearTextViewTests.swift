@@ -12,6 +12,11 @@ final class ClearTextViewTests: XCTestCase {
         sut.string = ""
     }
 
+    override func tearDown() {
+        sut = nil
+        super.tearDown()
+    }
+
     // MARK: - Select Word Under Cursor (Cmd+D)
 
     func test_selectWordUnderCursor_selectsCurrentWord() {
@@ -58,6 +63,13 @@ final class ClearTextViewTests: XCTestCase {
         sut.setSelectedRange(NSRange(location: 0, length: 0))
         sut.duplicateCurrentLine()
         XCTAssertEqual(sut.string, "hello\nhello\nworld")
+    }
+
+    func test_duplicateLine_lastLine_prependsNewline() {
+        sut.string = "hello\nworld"
+        sut.setSelectedRange(NSRange(location: 9, length: 0))  // cursor on "world" (last line)
+        sut.duplicateCurrentLine()
+        XCTAssertEqual(sut.string, "hello\nworld\nworld")
     }
 
     // MARK: - Move Line (Opt+Up / Opt+Down)
