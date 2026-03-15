@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		0C36B77BA9EC36D9453FC839 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A455627E6CDC8A39C809EA58 /* PersistenceManager.swift */; };
 		768691FDA46AEDAE10C4F75D /* PersistenceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99F4CD5FDAAA30A1FC94669F /* PersistenceManagerTests.swift */; };
+		7ABA07D26E9DE9C50B0A5370 /* ShortcutBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209434D353E0192436A04111 /* ShortcutBinding.swift */; };
+		81680334D21C58105DFC11D8 /* ShortcutRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97C8C25CA023FE9ECC7132BD /* ShortcutRegistry.swift */; };
+		923151D6B1881AFF48D766E4 /* HotkeyAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE71C167390EAD1736C391F9 /* HotkeyAction.swift */; };
+		A0F26AA13AA04932DA94513B /* ShortcutRegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD2141B3A68A018A09AB3E4 /* ShortcutRegistryTests.swift */; };
 		BB3EADE292A5DCE2D48EAB62 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2754C50E24FB934CAE628A0B /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
@@ -23,10 +27,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		209434D353E0192436A04111 /* ShortcutBinding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutBinding.swift; sourceTree = "<group>"; };
 		2754C50E24FB934CAE628A0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		32445EC3952922041FD55BB5 /* ClearText.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClearText.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6DD2141B3A68A018A09AB3E4 /* ShortcutRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRegistryTests.swift; sourceTree = "<group>"; };
+		97C8C25CA023FE9ECC7132BD /* ShortcutRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRegistry.swift; sourceTree = "<group>"; };
 		99F4CD5FDAAA30A1FC94669F /* PersistenceManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManagerTests.swift; sourceTree = "<group>"; };
 		A455627E6CDC8A39C809EA58 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
+		AE71C167390EAD1736C391F9 /* HotkeyAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyAction.swift; sourceTree = "<group>"; };
 		C0DD9D1C5B4D02065EFDD3D9 /* ClearText.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClearText.entitlements; sourceTree = "<group>"; };
 		C5D6AD386BF5FD277BD0F7CC /* ClearTextTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ClearTextTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBBCEAE17502496E80761C51 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -37,9 +45,20 @@
 			isa = PBXGroup;
 			children = (
 				565AEAF29027EB3F54935327 /* App */,
+				36ECEC6868B201F109BD31E8 /* Hotkeys */,
 				6248B47051A1F9658A1F0D04 /* Persistence */,
 			);
 			path = ClearText;
+			sourceTree = "<group>";
+		};
+		36ECEC6868B201F109BD31E8 /* Hotkeys */ = {
+			isa = PBXGroup;
+			children = (
+				AE71C167390EAD1736C391F9 /* HotkeyAction.swift */,
+				209434D353E0192436A04111 /* ShortcutBinding.swift */,
+				97C8C25CA023FE9ECC7132BD /* ShortcutRegistry.swift */,
+			);
+			path = Hotkeys;
 			sourceTree = "<group>";
 		};
 		565AEAF29027EB3F54935327 /* App */ = {
@@ -98,6 +117,7 @@
 			isa = PBXGroup;
 			children = (
 				99F4CD5FDAAA30A1FC94669F /* PersistenceManagerTests.swift */,
+				6DD2141B3A68A018A09AB3E4 /* ShortcutRegistryTests.swift */,
 			);
 			path = ClearTextTests;
 			sourceTree = "<group>";
@@ -175,7 +195,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB3EADE292A5DCE2D48EAB62 /* AppDelegate.swift in Sources */,
+				923151D6B1881AFF48D766E4 /* HotkeyAction.swift in Sources */,
 				0C36B77BA9EC36D9453FC839 /* PersistenceManager.swift in Sources */,
+				7ABA07D26E9DE9C50B0A5370 /* ShortcutBinding.swift in Sources */,
+				81680334D21C58105DFC11D8 /* ShortcutRegistry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,6 +207,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				768691FDA46AEDAE10C4F75D /* PersistenceManagerTests.swift in Sources */,
+				A0F26AA13AA04932DA94513B /* ShortcutRegistryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
