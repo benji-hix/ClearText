@@ -151,7 +151,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, HotkeyDelegate {
 
     private func showPanel() {
         previousApp = NSWorkspace.shared.frontmostApplication
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.activate()
         panel.makeKeyAndOrderFront(nil)
         tabController.activeView.window?.makeFirstResponder(tabController.activeView)
     }
@@ -199,8 +199,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, HotkeyDelegate {
         if preferencesController == nil {
             preferencesController = PreferencesWindowController()
         }
-        NSApp.activate(ignoringOtherApps: true)
-        preferencesController?.showWindow(nil)
+        NSApp.activate()
+        preferencesController?.window?.makeKeyAndOrderFront(nil)
     }
 
     @objc private func openAccessibilitySettings() {
