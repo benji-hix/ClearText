@@ -129,7 +129,17 @@ final class PreferencesWindowController: NSWindowController {
             ("Switch to Tab 2", .switchToTab(2)),
         ]
 
-        var yOffset: CGFloat = CGFloat(actions.count) * 36 + 40
+        let editorActions: [(String, ShortcutRegistry.EditorAction)] = [
+            ("Select Word Under Cursor", .selectWord),
+            ("Delete Current Line",      .deleteLine),
+            ("Duplicate Current Line",   .duplicateLine),
+            ("Move Line Up",             .moveLineUp),
+            ("Move Line Down",           .moveLineDown),
+            ("Select Entire Line",       .selectLine),
+        ]
+
+        let totalRows = actions.count + editorActions.count
+        var yOffset: CGFloat = CGFloat(totalRows) * 36 + 80
         var isFirstRow = true
         for (label, action) in actions {
             let nameLabel = NSTextField(labelWithString: label)
@@ -155,12 +165,34 @@ final class PreferencesWindowController: NSWindowController {
             }
         }
 
+        // Section header for editor shortcuts
+        let editorHeader = NSTextField(labelWithString: "Editor Shortcuts")
+        editorHeader.font = .boldSystemFont(ofSize: 12)
+        editorHeader.frame = NSRect(x: 16, y: yOffset - 8, width: 200, height: 18)
+        container.addSubview(editorHeader)
+        yOffset -= 30
+
+        for (label, editorAction) in editorActions {
+            let nameLabel = NSTextField(labelWithString: label)
+            nameLabel.frame = NSRect(x: 16, y: yOffset, width: 180, height: 22)
+            container.addSubview(nameLabel)
+
+            let captureField = KeyCaptureField()
+            captureField.stringValue = ShortcutRegistry.shared.editorBinding(for: editorAction).displayString
+            captureField.frame = NSRect(x: 200, y: yOffset, width: 130, height: 24)
+            captureField.targetEditorAction = editorAction
+            captureField.captureDelegate = self
+            captureField.bezelStyle = .squareBezel
+            container.addSubview(captureField)
+            yOffset -= 36
+        }
+
         // Reset button
         let resetBtn = NSButton(title: "Reset to Defaults", target: self, action: #selector(resetShortcuts))
         resetBtn.frame = NSRect(x: 200, y: 8, width: 150, height: 28)
         container.addSubview(resetBtn)
 
-        container.frame = NSRect(x: 0, y: 0, width: 360, height: CGFloat(actions.count) * 36 + 60)
+        container.frame = NSRect(x: 0, y: 0, width: 360, height: CGFloat(totalRows) * 36 + 100)
         scrollView.documentView = container
         return scrollView
     }

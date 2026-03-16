@@ -10,6 +10,7 @@ protocol KeyCaptureFieldDelegate: AnyObject {
 final class KeyCaptureField: NSTextField {
 
     var targetAction: HotkeyAction?
+    var targetEditorAction: ShortcutRegistry.EditorAction?
     weak var captureDelegate: (any KeyCaptureFieldDelegate)?
     private var isCapturing: Bool = false
     private var conflictLabel: NSTextField?
@@ -41,20 +42,34 @@ final class KeyCaptureField: NSTextField {
             & ShortcutBinding.modifierMask
         let binding = ShortcutBinding(keyCode: event.keyCode, modifiers: rawMods)
 
-        guard let action = targetAction else { return }
-
-        do {
-            try ShortcutRegistry.shared.updateBinding(binding, for: action)
-            stringValue = binding.displayString
-            exitCaptureMode()
-            captureDelegate?.keyCaptureField(self, didCapture: binding, for: action)
-        } catch ShortcutRegistryError.conflict(let conflicting) {
-            showConflict(conflicting.description, for: action)
-            captureDelegate?.keyCaptureField(self, conflictedWith: conflicting, for: action)
-        } catch ShortcutRegistryError.editorConflict(let conflicting) {
-            showConflict("Already used by: \(conflicting)", for: action)
-        } catch {
-            exitCaptureMode()
+        if let action = targetAction {
+            // Global hotkey capture
+            do {
+                try ShortcutRegistry.shared.updateBinding(binding, for: action)
+                savedStringValue = binding.displayString
+                exitCaptureMode()
+                captureDelegate?.keyCaptureField(self, didCapture: binding, for: action)
+            } catch ShortcutRegistryError.conflict(let conflicting) {
+                showConflict(conflicting.description, for: action)
+                captureDelegate?.keyCaptureField(self, conflictedWith: conflicting, for: action)
+            } catch ShortcutRegistryError.editorConflict(let conflicting) {
+                showConflict("Already used by: \(conflicting)", for: action)
+            } catch {
+                exitCaptureMode()
+            }
+        } else if let editorAction = targetEditorAction {
+            // Editor shortcut capture
+            do {
+                try ShortcutRegistry.shared.updateEditorBinding(binding, for: editorAction)
+                savedStringValue = binding.displayString
+                exitCaptureMode()
+            } catch ShortcutRegistryError.conflict(let conflicting) {
+                showConflict("Already used by: \(conflicting.description)", for: .toggleVisibility)
+            } catch ShortcutRegistryError.editorConflict(let conflicting) {
+                showConflict("Already used by: \(conflicting)", for: .toggleVisibility)
+            } catch {
+                exitCaptureMode()
+            }
         }
     }
 

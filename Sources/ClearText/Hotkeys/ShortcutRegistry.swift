@@ -178,6 +178,19 @@ final class ShortcutRegistry: @unchecked Sendable {
     }
 }
 
+extension ShortcutRegistry.EditorAction: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .selectWord:    return "Select Word Under Cursor"
+        case .deleteLine:    return "Delete Current Line"
+        case .duplicateLine: return "Duplicate Current Line"
+        case .moveLineUp:    return "Move Line Up"
+        case .moveLineDown:  return "Move Line Down"
+        case .selectLine:    return "Select Entire Line"
+        }
+    }
+}
+
 extension Notification.Name {
     static let shortcutBindingsChanged = Notification.Name("cleartext.shortcutBindingsChanged")
 }
