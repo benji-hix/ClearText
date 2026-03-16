@@ -7,6 +7,7 @@ protocol KeyCaptureFieldDelegate: AnyObject {
     func keyCaptureFieldDidCancel(_ field: KeyCaptureField)
 }
 
+@MainActor
 final class KeyCaptureField: NSTextField {
 
     var targetAction: HotkeyAction?
@@ -95,13 +96,10 @@ final class KeyCaptureField: NSTextField {
         let label = NSTextField(labelWithString: message)
         label.textColor = .systemRed
         label.font = .systemFont(ofSize: 11)
-        label.translatesAutoresizingMaskIntoConstraints = false
+        // Use frame-based positioning — the scroll container is frame-based, not Auto Layout.
+        label.frame = NSRect(x: frame.origin.x, y: frame.origin.y - 16, width: 280, height: 14)
         guard let sv = superview else { return }
         sv.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.leadingAnchor.constraint(equalTo: leadingAnchor),
-            label.topAnchor.constraint(equalTo: bottomAnchor, constant: 2)
-        ])
         conflictLabel = label
     }
 
