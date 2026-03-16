@@ -130,6 +130,7 @@ final class PreferencesWindowController: NSWindowController {
         ]
 
         var yOffset: CGFloat = CGFloat(actions.count) * 36 + 40
+        var isFirstRow = true
         for (label, action) in actions {
             let nameLabel = NSTextField(labelWithString: label)
             nameLabel.frame = NSRect(x: 16, y: yOffset, width: 180, height: 22)
@@ -143,6 +144,15 @@ final class PreferencesWindowController: NSWindowController {
             captureField.bezelStyle = .squareBezel
             container.addSubview(captureField)
             yOffset -= 36
+
+            if isFirstRow {
+                let warningLabel = NSTextField(labelWithString: "⚠ May conflict with system IME shortcuts on some configs")
+                warningLabel.textColor = .secondaryLabelColor
+                warningLabel.font = .systemFont(ofSize: 10)
+                warningLabel.frame = NSRect(x: 16, y: yOffset - 16, width: 340, height: 14)
+                container.addSubview(warningLabel)
+                isFirstRow = false
+            }
         }
 
         // Reset button
