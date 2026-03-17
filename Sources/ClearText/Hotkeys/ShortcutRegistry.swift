@@ -25,7 +25,7 @@ final class ShortcutRegistry: @unchecked Sendable {
     private static let defaultBindings: [(HotkeyAction, ShortcutBinding)] = {
         let cmdOpt = CGEventFlags.maskCommand.rawValue | CGEventFlags.maskAlternate.rawValue
         return [
-            (.toggleVisibility,    ShortcutBinding(keyCode: 49, modifiers: cmdOpt)),
+            (.toggleVisibility,    ShortcutBinding(keyCode: 42, modifiers: cmdOpt)),
             (.toggleAlwaysOnTop,   ShortcutBinding(keyCode: 17, modifiers: cmdOpt)),
             (.increaseTransparency,ShortcutBinding(keyCode: 30, modifiers: cmdOpt)),
             (.decreaseTransparency,ShortcutBinding(keyCode: 33, modifiers: cmdOpt)),
