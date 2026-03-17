@@ -1,8 +1,6 @@
 // Sources/ClearText/App/AppDelegate.swift
 import AppKit
 
-@main
-@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, HotkeyDelegate {
 
     // MARK: - Owned objects
