@@ -197,8 +197,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, HotkeyDelegate {
         if preferencesController == nil {
             preferencesController = PreferencesWindowController()
         }
+        NSApp.setActivationPolicy(.regular)
         NSApp.activate()
         preferencesController?.window?.makeKeyAndOrderFront(nil)
+
+        // Observe window close to hide Dock icon again
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: preferencesController?.window,
+            queue: .main
+        ) { [weak self] _ in
+            NSApp.setActivationPolicy(.accessory)
+            self?.preferencesController = nil
+        }
     }
 
     @objc private func openAccessibilitySettings() {
